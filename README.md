@@ -20,6 +20,9 @@ simulations of block copolymers" by: Hsieh Chen, YongJoo Kim, and Alfredo Alexan
 and "Lattice Boltzmann study of pattern formation in reaction-diffusion" by: S.G. Ayodele1, F. Varnik
 and D. Raabe
 
+Lees-Edwards boundary conditions implemented using: "Lees-Edwards boundary conditions for lattice Boltzmann suspension simulations" by: Eric Lorenz and Alfons G. Hoekstra. As well as: "Lees-Edwards boundary conditions for Lattice
+Boltzmann" by: Alexander J. Wagner and Ignacio Pagonabarraga.
+
 # To build
 
 To build. Clone repo. Then
