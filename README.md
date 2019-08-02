@@ -17,7 +17,7 @@ the field equations for a polymer chain.
 Implemeted using The Lattice Boltzmann Method Principles and Practice. ISBN: 978-3-319-44647-9
 SCFT solver implemented using "Lattice Boltzmann method for multiscale self-consistent field theory
 simulations of block copolymers" by: Hsieh Chen, YongJoo Kim, and Alfredo Alexander-Katz
-and "Lattice Boltzmann study of pattern formation in reaction-d" by: S.G. Ayodele1, F. Varnik
+and "Lattice Boltzmann study of pattern formation in reaction-diffusion" by: S.G. Ayodele1, F. Varnik
 and D. Raabe
 
 # To build
