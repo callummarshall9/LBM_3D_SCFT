@@ -59,7 +59,8 @@ int main(int argc, char** argv) {
   double box_length_rg = m_box_length_rg.GetDouble();
   const double R_g = NX / box_length_rg; // Using lattice units L = NX * delta_x, delta_x = 1, L = NX
   const double b = sqrt(6) / sqrt(n_steps) * R_g;
-  double tau_LB = 3 * b * b / 6.0 + 0.5;
+  //double tau_LB = 3 * b * b / 6.0 + 0.5;
+  double tau_LB = b * b / (6.0 * c_s * c_s) + 0.5;
   double gamma_dot = m_gamma_dot.GetDouble();
   bool output_indices = m_indices_output.GetBool();
   double viscosity = c_s * c_s * (tau_LB - 0.5);
@@ -69,8 +70,7 @@ int main(int argc, char** argv) {
   std::string velocity_set = m_velocity_set.GetString();
   std::string boundary_conditions = m_boundary_conditions.GetString();
   std::string field_type = m_field_type.GetString();
-
-    std::cout << "Save every: " << save_every << '\n';
+  std::cout << "Save every: " << save_every << '\n';
   std::cout << "Grid size: " << NX << "x" << NY << "x" << NZ << '\n';
   std::cout << "c_s (Speed of sound): " << c_s << '\n';
   if(tau_LB < 0.5) {
@@ -79,8 +79,8 @@ int main(int argc, char** argv) {
       return -1;
   }
 
-  if(velocity_set != "D3Q15" && velocity_set != "D3Q27" && velocity_set != "D2Q9") {
-      std::cout << "Error: Please specify a valid velocity set such as D3Q15,D3Q27 or D2Q9." << '\n';
+  if(velocity_set != "D3Q15" && velocity_set != "D3Q27" && velocity_set != "D2Q9" && velocity_set != "D3Q7") {
+      std::cout << "Error: Please specify a valid velocity set such as D3Q15,D3Q27,D3Q7 or D2Q9." << '\n';
       return -1;
   }
   std::cout << "Velocity set: " << velocity_set << '\n';
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
       std::cout << "Warning: NZ=1 for D2Q9.";
       return -1;
   }
-  LBM *solver = new LBM(NX,NY,NZ, velocity_set, c_s, tau_LB, boundary_conditions, gamma_dot);
+  LBM *solver = new LBM(NX,NY,NZ, velocity_set, c_s, tau_LB, boundary_conditions, gamma_dot, runs);
   for(int i = 0; i < argc; i++) {
       if(std::string(argv[i]) == "generate_ic") {
           solver->output_lbm_data("ic.csv", true);
@@ -144,6 +144,8 @@ int main(int argc, char** argv) {
           //solver->output_velocity();
       }
   }
+  std::cout << "Max value determined: " << solver->find_max() << '\n';
+  std::cout << "Min value determined: " << solver->find_min() << '\n';
   std::cout << std::endl;
   delete solver;
   return 0;
