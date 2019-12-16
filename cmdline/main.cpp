@@ -13,6 +13,7 @@
 #include "writer.h"
 #include "stringbuffer.h"
 #include "csv.h"
+#include "../SCFT/SCFT.hpp"
 #include <math.h>
 
 using namespace rapidjson;
@@ -49,6 +50,8 @@ int main(int argc, char** argv) {
   Value& m_gamma_dot = d["gamma_dot"];
   Value& m_indices_output = d["indices_in_output"];
   Value& m_field_type = d["field_type"];
+  Value& m_f = d["f"];
+  Value& m_florry_higgs = d["florry_higgs"];
   int save_every = save_every_value.GetInt();
   auto grid_size = d["grid_size"].GetArray();
   int NX = grid_size[0].GetInt();
@@ -67,6 +70,8 @@ int main(int argc, char** argv) {
   double radius_gyration = NX / box_length_rg;
   int scale = 1;
   int runs = n_steps * scale * scale * scale;
+  double f = m_f.GetDouble();
+  double florry_higgs = m_florry_higgs.GetDouble();
   std::string velocity_set = m_velocity_set.GetString();
   std::string boundary_conditions = m_boundary_conditions.GetString();
   std::string field_type = m_field_type.GetString();
@@ -94,8 +99,9 @@ int main(int argc, char** argv) {
       std::cout << "Warning: NZ=1 for D2Q9.";
       return -1;
   }
-  LBM *solver = new LBM(NX,NY,NZ, velocity_set, c_s, tau_LB, boundary_conditions, gamma_dot, runs);
-  for(int i = 0; i < argc; i++) {
+
+  SCFT *solver = new SCFT(NX,NY,NZ, velocity_set, c_s, tau_LB, boundary_conditions, gamma_dot, runs, f, florry_higgs, n_steps,box_length_rg,field_type);
+  /*for(int i = 0; i < argc; i++) {
       if(std::string(argv[i]) == "generate_ic") {
           solver->output_lbm_data("ic.csv", true);
           std::cout << "Generated ic.csv" << '\n';
@@ -120,7 +126,7 @@ int main(int argc, char** argv) {
   } else {
       std::cout << "Using default of p=1 for all x,y,z and u(x,t=0)=0 for all x,y,z. (Steady state)" << '\n';
       std::cout << "If you wish to use your own initial conditions, please run the program but with command: generate_ic as a argument which will output ic.csv in format of p,u_x,u_y,u_z, assume indexes are incrementing i,j,k for i<NX,j<NY and k<NZ" << '\n';
-  }
+  }*/
   //Equation 3.5 with delta t = 1, LBM Principles and Practice book.
   std::cout << "Kinematic shear viscosity: " << viscosity << '\n';
   //Equation 4.4.49
@@ -132,20 +138,21 @@ int main(int argc, char** argv) {
   std::cout << "Field type: " << field_type << '\n';
   std::cout << "From fields of fixed_sine and fixed_sech" << '\n';
   std::cout << "Relaxation time (Lattice Boltzmann) calculated: " << tau_LB << '\n';
-  solver->set_field_paramaeters(n_steps, box_length_rg, field_type);
+  std::cout << "f: " << f << '\n';
   solver->output_lbm_data("output/0.csv", false, output_indices);
-  solver->output_indices_file();
-  for(int i = 0; i < runs; i = i + 1) {
+  /*for(int i = 0; i < runs; i = i + 1) {
       solver->perform_timestep();
+      //std::cout << "Performed timestep." << '\n';
       if((i+1) % save_every == 0) {
           double percentage = (double) (i + 1) / (double) (runs) * 100.0;
           std::cout << "Saving data - " << (i + 1) << "/" << runs << " (" << percentage << "%)" << '\n';
-          solver->output_lbm_data("output/" + std::to_string(i + 1) + ".csv", false, output_indices);
-          //solver->output_velocity();
+          solver->output_lbm_data("output/" + std::to_string(i + 1), false, output_indices);
       }
-  }
-  std::cout << "Max value determined: " << solver->find_max() << '\n';
-  std::cout << "Min value determined: " << solver->find_min() << '\n';
+  }*/
+  solver->perform_field_calculations();
+  solver->output_lbm_data("output/1000", false, output_indices);
+  solver->output_max();
+  solver->output_min();
   std::cout << std::endl;
   delete solver;
   return 0;
