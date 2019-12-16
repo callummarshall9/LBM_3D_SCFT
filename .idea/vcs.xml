@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmdline/fast-cpp-csv-parser" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmdline/rapidjson" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/cmdline/rapidjson/thirdparty/gtest" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Catch2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/fast-cpp-csv-parser" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/rapidjson" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/rapidjson/thirdparty/gtest" vcs="Git" />
+  </component>
+</project>
