@@ -32,8 +32,9 @@ cmake .. \
 make
 
 # Projects used in this
-- RapidJSON
+- RapidJSON (https://github.com/Tencent/rapidjson)
 - fast-cpp-csv-parser (https://github.com/ben-strasser/fast-cpp-csv-parser)
+- Catch2 (https://github.com/catchorg/Catch2)
 
 # To visualise
 Run the simulation, then once it has ran. Run the visualise MATLAB script and it will then generate figure images and interactive figures in MATLAB.
