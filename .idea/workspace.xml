@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="cmdline_LBM" targetName="main_cmdline" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="22312898-e0f5-443f-93a9-d8ba424126f1" name="Default Changelist" comment="Added D3Q7 velocity set and tracking older statistical segment iterations.">
+      <change beforePath="$PROJECT_DIR$/cmdline/fast-cpp-csv-parser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmdline/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cmdline/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmdline/rapidjson" beforeDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Callum Marshall" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1TVZX37zzVwQUofSxY4c54kzVsf" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../PseudoSpectral1DChain" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="main_cmdline" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="cmdline_LBM" TARGET_NAME="main_cmdline" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="cmdline_LBM" RUN_TARGET_NAME="main_cmdline">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="22312898-e0f5-443f-93a9-d8ba424126f1" name="Default Changelist" comment="" />
+      <created>1573547259288</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1573547259288</updated>
+      <workItem from="1573547262233" duration="4333000" />
+      <workItem from="1573702962095" duration="10609000" />
+      <workItem from="1573891236406" duration="2726000" />
+      <workItem from="1574048469656" duration="5166000" />
+      <workItem from="1574053777789" duration="99000" />
+      <workItem from="1574053896554" duration="11000" />
+      <workItem from="1574161975359" duration="1643000" />
+      <workItem from="1574165132686" duration="473000" />
+      <workItem from="1574165616036" duration="2367000" />
+      <workItem from="1574670857351" duration="494000" />
+      <workItem from="1574673202939" duration="10858000" />
+      <workItem from="1574688241330" duration="251000" />
+      <workItem from="1574763001714" duration="9000" />
+      <workItem from="1575521174587" duration="6365000" />
+      <workItem from="1575744479802" duration="18000" />
+      <workItem from="1576463646632" duration="4603000" />
+    </task>
+    <task id="LOCAL-00001" summary="Added D3Q7 velocity set and tracking older statistical segment iterations.">
+      <created>1574050806622</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1574050806622</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Added D3Q7 velocity set and tracking older statistical segment iterations." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added D3Q7 velocity set and tracking older statistical segment iterations." />
+  </component>
+</project>

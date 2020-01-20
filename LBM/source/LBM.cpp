@@ -5,14 +5,14 @@
 #include <vector>
 #include <random>
 
-LBM::LBM(int grid_size, std::string velocity_set, double m_c_s, double m_tau, std::string m_boundary_condition, double m_gamma_dot, int m_runs) : NX(grid_size),NY(grid_size),NZ(grid_size),
-    c_s(m_c_s), tau_LB(m_tau), boundary_condition(m_boundary_condition), gamma_dot(m_gamma_dot), velocity_set(velocity_set), runs(m_runs) {
+LBM::LBM(int grid_size, std::string velocity_set, double m_c_s, double m_tau, std::string m_boundary_condition, double m_gamma_dot, int m_runs, double m_f, double m_florry_higgs) : NX(grid_size),NY(grid_size),NZ(grid_size),
+    c_s(m_c_s), tau_LB(m_tau), boundary_condition(m_boundary_condition), gamma_dot(m_gamma_dot), velocity_set(velocity_set), runs(m_runs), f(m_f), florry_higgs(m_florry_higgs) {
     set_velocity_set(velocity_set);
     initialise();
 }
 
-LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double m_c_s, double m_tau, std::string m_boundary_condition, double m_gamma_dot, int m_runs) : NX(nx), NY(ny), NZ(nz),
-    c_s(m_c_s), tau_LB(m_tau), boundary_condition(m_boundary_condition), gamma_dot(m_gamma_dot), velocity_set(velocity_set), runs(m_runs) {
+LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double m_c_s, double m_tau, std::string m_boundary_condition, double m_gamma_dot, int m_runs, double m_f, double m_florry_higgs) : NX(nx), NY(ny), NZ(nz),
+    c_s(m_c_s), tau_LB(m_tau), boundary_condition(m_boundary_condition), gamma_dot(m_gamma_dot), velocity_set(velocity_set), runs(m_runs), f(m_f), florry_higgs(m_florry_higgs) {
     set_velocity_set(velocity_set);
     initialise();
 }
@@ -20,23 +20,19 @@ LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double m_c_s, double 
 void LBM::initialise() {
     int box_flatten_length = NX * NY * NZ;
     int distributions_flatten_length = box_flatten_length * direction_size;
-    density_field = new double[box_flatten_length * (runs+1)];
+    chainPropagator = new double[box_flatten_length * (runs + 1)];
     velocity_field = new vector3<double>[box_flatten_length];
     particle_distributions_star = new double[distributions_flatten_length];
     particle_distributions = new double[distributions_flatten_length];
-    field_plus = new double[box_flatten_length];
-    field_minus = new double[box_flatten_length];
     for(int i = 0; i < NX * NY * NZ; i++) {
-        field_plus[i] = 0.0;
-        field_minus[i] = 0.0;
-        density_field[i] = 1.0;
+        chainPropagator[i] = 1.0;
     }
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++) {
                 for(int i = 0; i < direction_size; i++) {
-                    particle_distributions_star[scalar_index(x,y,z,i)] = weights[i] * density_field[scalar_index(x,y,z,time)];
-                    particle_distributions[scalar_index(x,y,z,i)] = weights[i] * density_field[scalar_index(x,y,z,time)];
+                    particle_distributions_star[scalar_index(x,y,z,i)] = weights[i] * chainPropagator[scalar_index(x, y, z, time)];
+                    particle_distributions[scalar_index(x,y,z,i)] = weights[i] * chainPropagator[scalar_index(x, y, z, time)];
                 }
             }
         }
@@ -48,10 +44,10 @@ double LBM::calculate_feq(int x, int y, int z, int i) {
     double dot_product = (double)velocity_field[scalar_index(x,y,z)].x * (double)directions[i].x + (double)velocity_field[scalar_index(x,y,z)].y * (double)directions[i].y +
                          (double)velocity_field[scalar_index(x,y,z)].z * (double)directions[i].z;
     //Equation 3.4 with c_s^2 = 1/3
-    //double feq = weights[i] * density_field[scalar_index(x,y,z)] * (1.0 + dot_product / (c_s * c_s) + dot_product * dot_product / (2 * c_s * c_s * c_s * c_s) - velocity_field[scalar_index(x,y,z)].norm_square() / (2 * c_s * c_s));
+    //double feq = weights[i] * chainPropagator[scalar_index(x,y,z)] * (1.0 + dot_product / (c_s * c_s) + dot_product * dot_product / (2 * c_s * c_s * c_s * c_s) - velocity_field[scalar_index(x,y,z)].norm_square() / (2 * c_s * c_s));
     //Equation (21) from Lattice Boltzmann Method for multiscale self-consistent field theory
     //simulations of block copolymers by Hsieh Chen, YongJoo Kim and Alfredo Alexander-Katz.
-    double feq = weights[i] * density_field[scalar_index(x,y,z,time)];
+    double feq = weights[i] * chainPropagator[scalar_index(x, y, z, time)];
     return feq;
 }
 
@@ -61,7 +57,7 @@ double LBM::calculate_feq(int x, int y, int z, int i, double u_le_x) {
     double norm_square = (velocity_field[scalar_index(x,y,z)].x + u_le_x) * (velocity_field[scalar_index(x,y,z)].x + u_le_x) + velocity_field[scalar_index(x,y,z)].y * directions[i].y +
                          velocity_field[scalar_index(x,y,z)].z * directions[i].z;
     //Equation 3.4 with c_s^2 = 1/3
-    double feq = weights[i] * density_field[scalar_index(x,y,z,time)] * (1.0 + dot_product / (c_s * c_s) + dot_product * dot_product / (2 * c_s * c_s * c_s * c_s) - norm_square / (2 * c_s * c_s));
+    double feq = weights[i] * chainPropagator[scalar_index(x, y, z, time)] * (1.0 + dot_product / (c_s * c_s) + dot_product * dot_product / (2 * c_s * c_s * c_s * c_s) - norm_square / (2 * c_s * c_s));
     return feq;
 }
 
@@ -110,7 +106,7 @@ void LBM::lookup_reverse() {
 }
 
 LBM::~LBM() {
-    delete[] density_field;
+    delete[] chainPropagator;
     delete[] particle_distributions;
 }
 
@@ -126,7 +122,7 @@ void LBM::output_array(double* array) {
 }
 
 void LBM::output_density() {
-    this->output_array(this->density_field);
+    this->output_array(this->chainPropagator);
 }
 
 void LBM::output_velocity() {
@@ -140,6 +136,10 @@ void LBM::output_velocity() {
     std::cout << std::endl;
 }
 
+void LBM::reset_time() {
+    time = 0;
+}
+
 void LBM::set_velocity(int x_field, int y_field, int z_field, double u_x, double u_y, double u_z) {
     velocity_field[scalar_index(x_field,y_field,z_field)].x = u_x;
     velocity_field[scalar_index(x_field,y_field,z_field)].y = u_y;
@@ -147,7 +147,7 @@ void LBM::set_velocity(int x_field, int y_field, int z_field, double u_x, double
 }
 
 void LBM::set_density(int x_field, int y_field, int z_field, double density) {
-    density_field[scalar_index(x_field,y_field,z_field,time)] = density;
+    chainPropagator[scalar_index(x_field, y_field, z_field, time)] = density;
 }
 
 
@@ -166,7 +166,7 @@ void LBM::compute_density_momentum_moment() {
                     u.y += particle_distributions[scalar_index(x,y,z,i)] * directions[i].y;
                     u.z += particle_distributions[scalar_index(x,y,z,i)] * directions[i].z;
                 }
-                density_field[scalar_index(x,y,z, time)] = new_density;
+                chainPropagator[scalar_index(x, y, z, time)] = new_density;
                 velocity_field[scalar_index(x,y,z)].x = u.x / new_density;
                 velocity_field[scalar_index(x,y,z)].y = u.y / new_density;
                 velocity_field[scalar_index(x,y,z)].z = u.z / new_density;
@@ -281,7 +281,7 @@ double sech(double x) {
     return 1.0 / cosh(x);
 }
 
-void LBM::set_field_paramaeters(double N, double Length_Rg, std::string m_field_type) {
+void LBM::set_field_parameters(double N, double Length_Rg, std::string m_field_type) {
     chain_length = N;
     box_length_rg = Length_Rg;
     const double delta_x = 1.0;//Lattice units.
@@ -318,7 +318,7 @@ void LBM::collision() {//Performs the collision step.
             for(int z = 0; z < NZ; z++) {
                 for(int i = 0; i < direction_size; i++) {
 
-                    double R = -field(x,y,z) * density_field[scalar_index(x,y,z,time)];
+                    double R = -field(x,y,z) * chainPropagator[scalar_index(x, y, z, time)];
                     double feq = calculate_feq(x,y,z,i);
                     //Equation 20
                     particle_distributions_star[scalar_index(x,y,z,i)] = particle_distributions[scalar_index(x,y,z,i)] +  tauinv * (feq - particle_distributions[scalar_index(x,y,z,i)])  + weights[i] * R;
@@ -330,47 +330,14 @@ void LBM::collision() {//Performs the collision step.
     }
 }
 
-double gauss_noise(double x) {
-    double mean = 0;
-    double stdev = 1.0;
-    return 1.0 / (stdev * sqrt(2 * M_PI)) * exp(-1.0 * pow(x - mean,2.0) / (2 * stdev * stdev));
+
+
+
+double* LBM::get_chain_propagator() {
+    return this->chainPropagator;
 }
 
-void LBM::perform_field_calculations() {
-    const double C = 20000.0;
-    const double flory_higgs = 0.5;
-    const double gamma = 1.0;
-    double Q = 0.0;
-    double sum = 0;
-    double h = 1.0;
 
-    //Obtain the zero frequency component as Q(w) = a_0(N), according to FFTW
-    //the zero frequency is at index 0.
-    sum = sum / (NX * NY * NZ);
-    std::default_random_engine generator;
-    std::normal_distribution<double> dist(0, 1);
-    for(int x = 0; x < NX; x++) {
-        for(int y = 0; y < NY; y++) {
-            for(int z = 0; z < NZ; z++) {
-
-            }
-        }
-    }
-    /*double C = 1.0;
-    double T = 1.0;
-    double florry_higgs = 0.5;
-    double N = 1000;//Total number of statistical segments.
-    for(int x = 0; x < NX; x++) {
-        for(int y = 0; y < NY; y++) {
-            for(int z = 0; z < NZ; z++) {
-                double density_segment_A = 0;
-                double density_segment_B = 0;
-                double density_minus = density_segment_A - density_segment_B;
-                field_minus[scalar_index(x,y,z)] = field_minus[scalar_index(x,y,z)] - T * C * (-1.0 * density_minus + 2.0 / (florry_higgs * N) * field_minus[scalar_index(x,y,z)]) + gauss_noise(time);
-            }
-        }
-    }*/
-}
 
 int LBM::get_time() {return time;}
 
@@ -414,7 +381,7 @@ void LBM::output_lbm_data(std::string filename, bool header, bool output_indices
                 if(output_indices) {
                     output_stream << x << "," << y << "," << z << ",";
                 }
-                output_stream << density_field[scalar_index(x,y,z,time)] << "," <<
+                output_stream << chainPropagator[scalar_index(x, y, z, time)] << "," <<
                               velocity_field[scalar_index(x,y,z)].x << "," <<
                               velocity_field[scalar_index(x,y,z)].y << "," <<
                               velocity_field[scalar_index(x,y,z)].z << "," << field(x, a, b) << '\n';
@@ -431,8 +398,8 @@ double LBM::find_max() {
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++ ) {
             for(int z = 0; z < NZ; z++) {
-                if(density_field[scalar_index(x,y,z,time)] > max) {
-                    max = density_field[scalar_index(x,y,z,time)];
+                if(chainPropagator[scalar_index(x, y, z, time)] > max) {
+                    max = chainPropagator[scalar_index(x, y, z, time)];
                 }
             }
         }
@@ -441,10 +408,10 @@ double LBM::find_max() {
 }
 
 double LBM::find_min() {
-    double min = density_field[scalar_index(0,0,0, time)];
+    double min = chainPropagator[scalar_index(0, 0, 0, time)];
     for(int x = 0; x < NX; x++) {
-        if(density_field[scalar_index(x,0,0, time)] < min) {
-            min = density_field[scalar_index(x,0,0, time)];
+        if(chainPropagator[scalar_index(x, 0, 0, time)] < min) {
+            min = chainPropagator[scalar_index(x, 0, 0, time)];
         }
     }
     return min;

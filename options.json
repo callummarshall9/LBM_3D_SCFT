@@ -10,6 +10,8 @@
   "n_steps": 1000,
   "indices_in_output": true,
   "box_length_rg": 3.2,
-  "field_type": "fixed_sine"
+  "field_type": "fixed_sine",
+  "f": 0.5,
+  "florry_higgs": 13
 }
 
