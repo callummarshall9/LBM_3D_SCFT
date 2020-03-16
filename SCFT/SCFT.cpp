@@ -1,38 +1,60 @@
 #include <cmath>
 #include <random>
 #include <iostream>
+#include <algorithm>
 #include <filesystem>
 #include "LBM.hpp"
 #include "SCFT.hpp"
 
-SCFT::SCFT(int NX,int NY, int NZ, std::string velocity_set, double c_s, double tau, std::string boundary_conditions,
-           double gamma_dot, int runs, double f, double florry_higgs, double chain_length, double length_rg, std::string field_type) : NX(NX), NY(NY), NZ(NZ), velocity_set(velocity_set),
-           c_s(c_s), boundary_conditions(boundary_conditions), gamma_dot(gamma_dot), runs(runs), f(f), florry_higgs(florry_higgs) {
+SCFT::SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, std::string boundary_conditions,
+           double gamma_dot, double N, int N_s, double f, double chiN, double box_length_rg,
+           std::string m_field_type, double mixing_parameter) : NX(NX), NY(NY), NZ(NZ), velocity_set(velocity_set),
+                                                                          c_s(c_s), boundary_conditions(boundary_conditions), gamma_dot(gamma_dot), N(N), N_s(N_s), f(f), box_length_rg(box_length_rg), chiN(chiN), field_type(m_field_type), mixing_parameter(mixing_parameter) {
     int box_flatten_length = NX * NY * NZ;
-    field_plus = new double[box_flatten_length];
-    field_minus = new double[box_flatten_length];
-    for(int i = 0; i < box_flatten_length; i++) {
-        field_plus[i] = 0.0;
-        field_minus[i] = 0.0;
+    w_A = new double[box_flatten_length];
+    w_B = new double[box_flatten_length];
+    this->delta_x = 1.0;//Lattice units.
+    this->N = N;
+    this->box_length_rg = box_length_rg;
+    const double L = (double)NX * delta_x;
+    this->R_g = L / box_length_rg;
+    const double b = sqrt(6.0) / sqrt(N) * R_g;
+    this->delta_s = 1.0;
+    for(int x = 0; x < NX; x++) {
+        for(int y = 0; y < NY; y++) {
+            for(int z = 0; z < NZ; z++) {
+                const double value = 1.0 * sin(2 * M_PI * (x * delta_x - L / 2.0) / L);
+                w_A[scalar_index(x,y,z)] = -value;
+                w_B[scalar_index(x,y,z)] = value;
+            }
+        }
     }
+
+    /*
+
+    for(int x = 0; x < NX; x++) {
+        for(int y = 0; y < NY; y++) {
+            for(int z = 0; z < NZ; z++) {
+                //w_A[scalar_index(x,y,z)] = dist(generator) /N * 10.0;
+                w_A[scalar_index(x,y,z)] = 0.0;
+                w_B[scalar_index(x,y,z)] = dist(generator) / N;
+                //w_A[scalar_index(x,y,z)] = 0.0;
+                //w_B[scalar_index(x,y,z)] = 0.0;
+            }
+        }
+    }*/
+
+    //w_B[scalar_index(0,0,0)] = -5.0;
+    //w_B[scalar_index(midpoint, 0, 0)] = 5.0;
+
     density_A = new double[box_flatten_length];
     density_B = new double[box_flatten_length];
-    q_propagator = new qPropagator(NX, NY, NZ,velocity_set,c_s,tau,boundary_conditions,gamma_dot, runs, f, florry_higgs, field_plus, field_minus);
-    q_star_propagator = new qStarPropagator(NX, NY, NZ , velocity_set, c_s, tau, boundary_conditions, gamma_dot, runs, f, florry_higgs, field_plus, field_minus);
-    q_propagator->set_field_parameters(chain_length, length_rg, field_type);
-    q_star_propagator->set_field_parameters(chain_length, length_rg, field_type);
-    const double delta_x = 1.0;//Lattice units.
-    const double L = (double)NX * delta_x;
-    R_g = L / length_rg;
-
-
+    q_propagator = new qPropagator(NX,NY,NZ,velocity_set,c_s,boundary_conditions,gamma_dot,N,N_s,box_length_rg,field_type,f,chiN,w_A,w_B);
+    q_dagger_propagator = new qStarPropagator(NX,NY,NZ,velocity_set,c_s,boundary_conditions,gamma_dot,N,N_s,box_length_rg,field_type,f,chiN,w_A,w_B);
+    tau_LB = q_propagator->tau_LB;
 }
 
-double gauss_noise(double x) {
-    std::default_random_engine generator;
-    std::normal_distribution<double> dist(0, 1);
-    return dist(generator);
-}
+
 
 void SCFT::output_lbm_data(std::string filename, bool header, bool output_indices) {
     std::ofstream output_stream;
@@ -41,21 +63,23 @@ void SCFT::output_lbm_data(std::string filename, bool header, bool output_indice
         if(output_indices) {
             output_stream << "x,y,z,";
         }
-        output_stream << "p,u_x,u_y,u_z" << '\n';
+        output_stream << "q,q*,phi_A,phi_B,phi, wA,wB" << '\n';
     }
-
+    std::cout << "s: " << s << '\n';
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++) {
                 if(output_indices) {
                     output_stream << x << "," << y << "," << z << ",";
                 }
-                output_stream << this->q_propagator->get_chain_propagator()[scalar_index(x, y, z, time)] << "," <<
-                    this->q_star_propagator->get_chain_propagator()[scalar_index(x,y,z,time)] << "," <<
-                    this->density_A[scalar_index(x,y,z)] << "," <<
+                double phi = density_A[scalar_index(x,y,z)] + density_B[scalar_index(x,y,z)];
+                output_stream << this->q_propagator->get_chain_propagator()[scalar_index(x, y, z, s)] << "," <<
+                              this->q_dagger_propagator->get_chain_propagator()[scalar_index(x, y, z, s)] << "," <<
+                              this->density_A[scalar_index(x,y,z)] << "," <<
                     this->density_B[scalar_index(x,y,z)] << "," <<
-                    this->q_propagator->field(x,y,z) << "," <<
-                    this->q_star_propagator->field(x,y,z) << '\n';
+                    phi << "," <<
+                    w_A[scalar_index(x,y,z)] << "," <<
+                    w_B[scalar_index(x,y,z)] << '\n';
             }
         }
     }
@@ -65,29 +89,26 @@ void SCFT::output_lbm_data(std::string filename, bool header, bool output_indice
 
 void SCFT::output_max() {
     std::cout << "Q propagator max value: " << q_propagator->find_max() << '\n';
-    std::cout << "Q dagger propagator max value: " << q_star_propagator->find_max() << '\n';
+    std::cout << "Q dagger propagator max value: " << q_dagger_propagator->find_max() << '\n';
 }
 
 void SCFT::output_min() {
     std::cout << "Q propagator min value: " << q_propagator->find_min() << '\n';
-    std::cout << "Q dagger propagator min value: " << q_star_propagator->find_min() << '\n';
+    std::cout << "Q dagger propagator min value: " << q_dagger_propagator->find_min() << '\n';
 }
 
 void SCFT::perform_timestep() {
-    time++;
+    s++;
     q_propagator->perform_timestep();
-    q_star_propagator->perform_timestep();
+    q_dagger_propagator->perform_timestep();
 }
 
-double SCFT::compute_reduced_density_segment_plus_variance() {
+double SCFT::Determine_Variance_Total() {
     double sum = 0.0;
     double sumOfSquares = 0.0;
     for(int x = 0; x < NX; x++ ){
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++ ) {
-                //double density_segment_A = compute_reduced_density_segment_A(x,y,z);
-                //double density_segment_B = compute_reduced_density_segment_B(x,y,z);
-
                 double density_plus = density_A[scalar_index(x,y,z)] + density_B[scalar_index(x,y,z)];
                 sum += density_plus;
                 sumOfSquares += pow(density_plus, 2.0);
@@ -99,69 +120,60 @@ double SCFT::compute_reduced_density_segment_plus_variance() {
     return (meanSquares - pow(mean,2.0));
 }
 
-double SCFT::compute_Q() {
-    double sum = 0.0;
-    double* chainPropagator = q_propagator->get_chain_propagator();
 
+double SCFT::compute_Q() {
+    double sum_q = 0.0;
+    double sum_q_star = 0.0;
+    double* chainPropagator = q_propagator->get_chain_propagator();
+    double* qStarChainPropagator = q_dagger_propagator->get_chain_propagator();
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++) {
-                sum = sum + chainPropagator[scalar_index(x, y, z, runs)];
+                sum_q = sum_q + chainPropagator[scalar_index(x, y, z, N)];
+                sum_q_star = sum_q_star + qStarChainPropagator[scalar_index(x,y,z,N)];
             }
         }
     }
-    sum /= (NX * NY * NZ);
-    return sum;
+    sum_q /= (NX * NY * NZ);
+    sum_q_star /= (NX * NY * NZ);
+
+    if((sum_q - sum_q_star) > 0.0001) {//If the difference in the q and q star Q value propagations don't match, output a warning.
+        //std::cout << "Warning: Q for q propagator doesn't match q star propagator." << '\n';
+    }
+    if(sum_q > sum_q_star) {
+        return sum_q;
+    } else {
+        return sum_q_star;
+    }
 }
 
 
 double SCFT::compute_reduced_density_segment_A(int x, int y, int z) {
     double* chainPropagatorQ = q_propagator->get_chain_propagator();
-    double* chainPropagatorQStar = q_star_propagator->get_chain_propagator();
-    //Integral of q_star * q from 0..f using Simpson 1/3 rule.
-    int up_to = f * runs;
-    double sum = 0;
-    double h = 1;
+    double* chainPropagatorQStar = q_dagger_propagator->get_chain_propagator();
+    double sum = 0.0;
+    const int up_to = lround(f * N);
     for(int s = 0; s < up_to; s++) {
-        if(s == 0) {
-            sum = sum + h / 3 * chainPropagatorQ[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        } else if(s == up_to) {
-            sum = sum + h / 3 * chainPropagatorQStar[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        } else if(s % 2 == 1) {
-            sum = sum + h / 3 * 4 * chainPropagatorQ[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        } else if(s % 2 == 0) {
-            sum = sum + h / 3 * 2 * chainPropagatorQ[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        }
+        sum += chainPropagatorQStar[scalar_index(x,y,z,N - s)] * chainPropagatorQ[scalar_index(x,y,z,s)] * delta_s;
     }
-    sum /= compute_Q();
+    sum /= (compute_Q() * N);
     return sum;
 }
 
 double SCFT::compute_reduced_density_segment_B(int x, int y, int z) {
-    double* chainPropagator = q_propagator->get_chain_propagator();
-    double* chainPropagatorQStar = q_star_propagator->get_chain_propagator();
-
-    //Integral of q_star * q from fN..N using Simpson 1/3 rule.
-    double sum = 0;
-    double h = 1;
-    int up_to = runs;
-    for(int s = f* runs; s < up_to; s++) {
-        if(s == 0) {
-            sum = sum + h / 3 * chainPropagator[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        } else if(s == up_to) {
-            sum = sum + h / 3 * chainPropagator[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        } else if(s % 2 == 1) {
-            sum = sum + h / 3 * 4 * chainPropagator[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        } else if(s % 2 == 0) {
-            sum = sum + h / 3 * 2 * chainPropagator[scalar_index(x, y, z, s)] * chainPropagatorQStar[scalar_index(x, y, z, runs - s)];
-        }
+    double* chainPropagatorQ = q_propagator->get_chain_propagator();
+    double* chainPropagatorQStar = q_dagger_propagator->get_chain_propagator();
+    double sum = 0.0;
+    const int up_to = lround(f * N);
+    for(int s = up_to; s < N; s++) {
+        sum += chainPropagatorQStar[scalar_index(x,y,z,N - s)] * chainPropagatorQ[scalar_index(x,y,z,s)] * delta_s;
     }
-    sum /= compute_Q();
+    sum /= (compute_Q() * N);
     return sum;
 }
 
 
-void SCFT::update_density_segments() {
+void SCFT::Determine_Density_Differences() {
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++) {
@@ -173,68 +185,123 @@ void SCFT::update_density_segments() {
 }
 
 
-void SCFT::run_propogators() {
-    time = 0;
+void SCFT::Run_Propagators() {
+    s = 0;
     q_propagator->reset_time();
-    q_star_propagator->reset_time();
-    for(int i = 0; i < runs; i++) {
+    q_dagger_propagator->reset_time();
+    for(int i = 0; i < N_s; i++) {
         perform_timestep();
     }
 }
 
-void SCFT::update_field_minus(double C, double flory_higgs) {
+void SCFT::Update_Fields() {
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++) {
-                double density_minus = density_A[scalar_index(x,y,z)] - density_B[scalar_index(x,y,z)];
-
-                field_minus[scalar_index(x,y,z)] = field_minus[scalar_index(x,y,z)] - C * (-density_minus + 2.0 / flory_higgs * field_minus[scalar_index(x,y,z)]) + gauss_noise(time);
-                //field_plus is assumed to always be complex.
+                double compressibility_condition = 0.5 * (w_A[scalar_index(x,y,z)] + w_B[scalar_index(x,y,z)] - chiN);
+                double w_a_out = chiN * density_B[scalar_index(x,y,z)] + compressibility_condition;
+                double w_b_out = chiN * density_A[scalar_index(x,y,z)] + compressibility_condition;
+                double w_a = (w_A[scalar_index(x,y,z)] * (1.0 - mixing_parameter) + mixing_parameter * w_a_out);
+                double w_b = (w_B[scalar_index(x,y,z)] * (1.0 - mixing_parameter) + mixing_parameter * w_b_out);
+                w_A[scalar_index(x,y,z)] = w_a;
+                w_B[scalar_index(x,y,z)] = w_b;
+                //std::cout << "bob!" << '\n';
             }
         }
     }
-}
-
-void SCFT::update_field_plus(double C, double flory_higgs) {
-    const double gamma = 1.0;
-    int fail_safe = 0;
-    const int fail_safe_max = 100;
-    while(compute_reduced_density_segment_plus_variance() > 0.0001) {//Ah, crap
-        for(int x = 0; x < NX; x++) {
-            for (int y = 0; y < NY; y++) {
-                for (int z = 0; z < NZ; z++) {
-                    double density_plus = density_A[scalar_index(x,y,z)] + density_B[scalar_index(x,y,z)];
-                    field_plus[scalar_index(x,y,z)] = field_plus[scalar_index(x,y,z)] - gamma * C * (density_plus - 1.0);
-                }
+    double w_a_b_average = 0.0;
+    for(int x = 0; x < NX; x++) {
+        for(int y = 0; y < NY; y++) {
+            for(int z = 0; z < NZ; z++) {
+                w_a_b_average += w_A[scalar_index(x,y,z)] + w_B[scalar_index(x,y,z)];
             }
         }
-        std::cout << "Relaxing field plus (attempt " << fail_safe + 1 << "/" << fail_safe_max << ")" << '\n';
-        run_propogators();
-        update_density_segments();
-        fail_safe++;
-        if(fail_safe > fail_safe_max) {
-            std::cout << "ERROR: INFINITE LOOP DETECTED." << '\n';
-            exit(-1);
-        }
+    }
+    w_a_b_average /= (2.0 * NX * NY * NZ);
+    for(int i = 0; i < NX * NY * NZ; i++) {
+        w_A[i] -= w_a_b_average;
+        w_B[i] -= w_a_b_average;
     }
 }
 
+double SCFT::Determine_Error() {
+    double sum = 0.0;
+    for(int x = 0; x < NX; x++) {
+        for(int y = 0; y < NY; y++) {
+            for(int z = 0; z < NZ; z++) {
+                double compressibility_condiiton = 0.5 * (w_A[scalar_index(x,y,z)] + w_B[scalar_index(x,y,z)] - chiN);
+                double w_a_out = chiN * density_B[scalar_index(x,y,z)] + compressibility_condiiton;
+                double w_b_out = chiN * density_A[scalar_index(x,y,z)] + compressibility_condiiton;
+                double difference_in_w_A = fabs(pow(w_a_out - w_A[scalar_index(x,y,z)], 2.0));
+                double difference_in_w_B = fabs(pow(w_b_out - w_B[scalar_index(x,y,z)], 2.0));
+                sum = sum + (difference_in_w_A + difference_in_w_B) * delta_x;
+            }
+        }
+    }
+    sum = sqrt(1.0 / ((NX * NY * NZ) * delta_x) * sum) / std::max(1.0, chiN);
+    //output_fields.close();
+    return sum;
+}
 
-void SCFT::perform_field_calculations() {
-    const double C = 1.0 * pow(R_g, 3.0) / runs;
-    //C=rho_0 * R_g^3/N, Below Equation 9 in text 'Diblock Copolymer Thin Films: A Field-Theoretic Simulation Study
-    //by Alexander-Katz and Glenn H. Fredrickson.
-    const double flory_higgs = 13.0;
-
-    for(int i = 0; i < runs; i++) {
-        std::cout << "Running propagator run (" << (i+1) << "/" << runs << ")" << '\n';
-        run_propogators();
-        update_density_segments();//Update reduced segment density A and B on each of the lattice nodes.
-        update_field_minus(C,flory_higgs);
-        update_field_plus(C,flory_higgs);
-
-        output_lbm_data("output/" + std::to_string(i+1)  + ".csv", false, true);
-
+void SCFT::Run() {
+    if(field_type == "scft") {
+        int index = 1.0;
+        double field_error_threshold = pow(10.0,-3.0);
+        double variance_threshold = pow(10.0,-5.0);
+        double field_error = Determine_Error();
+        double variance_error = sqrt(Determine_Variance_Total());
+        while(field_error > field_error_threshold || variance_error > variance_threshold) {
+            double error_field = Determine_Error();
+            double error_variance = Determine_Variance_Total();
+            std::cout << index << " - Error: " << error_field << '\n';
+            std::cout << index << " - Stdev: " << sqrt(error_variance) << '\n';
+            Run_Propagators();
+            Determine_Density_Differences();
+            Update_Fields();
+            std::string file_name = "output/" + std::to_string(index) + ".csv";
+            if(index % 200 == 0) {
+                output_lbm_data(file_name, true, true);
+            }
+            if(!stable()) {
+                std::cout << "Warning: Numerical stability compromised |u_max|>=0.577" << '\n';
+            }
+            index++;
+            if(index > 2000) {
+                break;
+            }
+            field_error = Determine_Error();
+            variance_error = sqrt(Determine_Variance_Total());
+        }
+        std::cout << index << " - Error: " << field_error << '\n';
+        std::cout << index << " - Stdev: " << variance_error << '\n';
+        output_lbm_data("output/output.csv", true, true);
+    } else {
+        Run_Propagators();
+        output_lbm_data("output/output.csv", true, true);
     }
 
+}
+
+bool SCFT::stable() {
+    return (q_propagator->stable() && q_dagger_propagator->stable());
+}
+
+bool SCFT::u_stable() {
+    return (q_propagator->u_stable() && q_dagger_propagator->u_stable());
+}
+
+bool SCFT::relaxation_stable() {
+    return q_propagator->relaxation_stable();
+}
+
+void SCFT::output_parameters() {
+    q_propagator->output_parameters();
+}
+
+void SCFT::output_field_parameters() {
+    q_propagator->output_field_parameters();
+}
+
+double SCFT::find_u_max() {
+    return q_propagator->find_u_max();
 }

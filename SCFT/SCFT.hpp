@@ -4,35 +4,51 @@
 
 #include "qPropagator.hpp"
 #include "qStarPropagator.hpp"
-
+#include <random>
 #ifndef CMDLINE_LBM_SCFT_HPP
 #define CMDLINE_LBM_SCFT_HPP
 
 class SCFT {
 public:
     qPropagator *q_propagator;
-    qStarPropagator *q_star_propagator;
-    SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, double tau, std::string boundary_conditions, double gamma_dot, int runs, double f, double florry_higgs, double chain_length, double length_rg, std::string m_field_type);
-    void perform_field_calculations();
+    qStarPropagator *q_dagger_propagator;
+    SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, std::string boundary_conditions,
+         double gamma_dot, double N, int N_s, double f, double chiN, double box_length_rg,
+         std::string m_field_type, double mixing_parameter);
+    void Run();
+    double Determine_Error();
+    void Update_Fields();
     double compute_reduced_density_segment_A(int x, int y, int z), compute_reduced_density_segment_B(int x, int y, int z);
-    double compute_reduced_density_segment_plus_variance();
-    void update_density_segments();
+    double Determine_Variance_Total();
+    void Determine_Density_Differences();
     double compute_Q();
     void perform_timestep();
-    void run_propogators();
+    void Run_Propagators();
     void output_lbm_data(std::string filename, bool header, bool output_indices);
     void output_max();
     void output_min();
-    void update_field_minus(double C, double flory_higgs);
-    void update_field_plus(double C, double flory_higgs);
+    bool stable();
+    bool u_stable();
+    bool relaxation_stable();
+    void output_parameters();
+    void output_field_parameters();
+    double find_u_max();
+    double tau_LB;
+
+
 private:
+    double delta_x, delta_s;
+    double box_length_rg;
+    double N;
+    int N_s;
+    double mixing_parameter;
     double R_g;
     int NX, NY, NZ;
-    int time = 0;
+    int s = 0;
+    std::string field_type;
     std::string velocity_set,boundary_conditions;
-    double c_s, tau, gamma_dot,f,florry_higgs;
-    int runs;
-    double *field_plus,*field_minus,*density_A,*density_B;//FTS fields.
+    double c_s, gamma_dot,f,chiN;
+    double *w_A,*w_B,*density_A,*density_B;//FTS fields.
     inline int scalar_index(int x, int y, int z) const {
         return (z * NX * NY) + (y * NX) + x;
     }

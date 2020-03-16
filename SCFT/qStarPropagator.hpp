@@ -9,10 +9,8 @@
 
 class qStarPropagator : public LBM {
 public:
-    qStarPropagator(int NX, int NY, int NZ, std::string velocity_set, double c_s, double tau, std::string boundary_conditions, double gamma_dot, int runs, double f, double florry_higgs,
-            double* field_plus, double* field_minus);
+    qStarPropagator(int nx, int ny, int nz, std::string velocity_set, double c_s, std::string boundary_condition, double gamma_dot, double N, int N_s, double box_length_rg, std::string field_type, double f, double chiN, double* w_A, double* w_B);
     double field(int x, int y, int z) override;
-    double *field_plus, *field_minus;
 };
 
 

@@ -1,17 +1,15 @@
 {
-  "grid_size": [64,64,64],
-  "save_every": 200,
+  "grid_size": [64,1,1],
   "c_s": 0.577350269,
   "velocity_set": "D3Q15",
   "nu": 0.16666666666,
-  "tau_LB": 1.7,
   "gamma_dot": 0.001,
   "boundary_conditions": "periodic",
-  "n_steps": 1000,
-  "indices_in_output": true,
+  "chain_length": 1000,
   "box_length_rg": 3.2,
-  "field_type": "fixed_sine",
+  "field_type": "scft",
   "f": 0.5,
-  "florry_higgs": 13
+  "chiN": 13,
+  "N_s": 1000
 }
 

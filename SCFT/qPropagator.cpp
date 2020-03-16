@@ -4,16 +4,22 @@
 
 #include "qPropagator.hpp"
 
-qPropagator::qPropagator(int NX, int NY, int NZ, std::string velocity_set, double c_s, double tau, std::string boundary_conditions, double gamma_dot, int runs, double f, double florry_higgs,
-        double* field_plus, double* field_minus):
-    LBM(NX,NY,NZ, velocity_set, c_s, tau, boundary_conditions, gamma_dot, runs, f, florry_higgs), field_plus(field_plus), field_minus(field_minus) {
+qPropagator::qPropagator(int nx, int ny, int nz, std::string velocity_set, double c_s, std::string boundary_condition,
+        double gamma_dot, double N, int N_s, double box_length_rg, std::string field_type, double f, double chiN,
+        double* w_A, double* w_B):
+    LBM(nx,ny,nz,velocity_set,c_s,boundary_condition,gamma_dot,N,N_s,box_length_rg,field_type,f,chiN,w_A,w_B) {
 }
 
 double qPropagator::field(int x, int y, int z) {
-    if(get_time() < runs * f) {
-        return (-field_plus[scalar_index(x,y,z)] - field_minus[scalar_index(x,y,z)]) / runs;
+    //Reference [1] - Fields omega_{pm} = N lowercase omega_{pm}
+    if(field_type == "scft") {
+        if(s < N * f) {
+            return w_A[scalar_index(x,y,z)] / N;
+        } else {
+            return w_B[scalar_index(x,y,z)] / N;
+        }
     } else {
-        return (-field_plus[scalar_index(x,y,z)] + field_minus[scalar_index(x,y,z)]) / runs;
+        return LBM::field(x,y,z);
     }
-    return LBM::field(x,y,z);
+
 }

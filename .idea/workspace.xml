@@ -11,12 +11,20 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="22312898-e0f5-443f-93a9-d8ba424126f1" name="Default Changelist" comment="Added D3Q7 velocity set and tracking older statistical segment iterations.">
-      <change beforePath="$PROJECT_DIR$/cmdline/fast-cpp-csv-parser" beforeDir="false" />
+    <list default="true" id="22312898-e0f5-443f-93a9-d8ba424126f1" name="Default Changelist" comment="Fixed some bugs. Caused some others.">
+      <change afterPath="$PROJECT_DIR$/references.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LBM/headers/LBM.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/LBM/headers/LBM.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LBM/source/LBM.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/LBM/source/LBM.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SCFT/SCFT.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SCFT/SCFT.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SCFT/SCFT.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/SCFT/SCFT.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SCFT/qPropagator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SCFT/qPropagator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SCFT/qPropagator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/SCFT/qPropagator.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SCFT/qStarPropagator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SCFT/qStarPropagator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SCFT/qStarPropagator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/SCFT/qStarPropagator.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cmdline/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cmdline/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmdline/rapidjson" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/options.json" beforeDir="false" afterPath="$PROJECT_DIR$/options.json" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -29,30 +37,47 @@
   <component name="Git.Settings">
     <option name="PREVIOUS_COMMIT_AUTHORS">
       <list>
+        <option value="Callum Marshall &lt;callummarshall9@googlemail.com&gt;" />
         <option value="Callum Marshall" />
       </list>
     </option>
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
+      </GitPushTagMode>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="hiddenUrls">
+      <set>
+        <option value="https://github.com/ben-strasser/fast-cpp-csv-parser.git" />
+        <option value="https://github.com/catchorg/Catch2.git" />
+        <option value="https://github.com/google/googletest.git" />
+      </set>
+    </option>
   </component>
   <component name="ProjectId" id="1TVZX37zzVwQUofSxY4c54kzVsf" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../PseudoSpectral1DChain" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager">
     <configuration name="main_cmdline" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="cmdline_LBM" TARGET_NAME="main_cmdline" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="cmdline_LBM" RUN_TARGET_NAME="main_cmdline">
@@ -60,6 +85,18 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -87,6 +124,36 @@
       <workItem from="1575521174587" duration="6365000" />
       <workItem from="1575744479802" duration="18000" />
       <workItem from="1576463646632" duration="4603000" />
+      <workItem from="1579613910205" duration="2483000" />
+      <workItem from="1579683830197" duration="599000" />
+      <workItem from="1580200962931" duration="53000" />
+      <workItem from="1580414758963" duration="629000" />
+      <workItem from="1580415456994" duration="9179000" />
+      <workItem from="1580427056172" duration="10000" />
+      <workItem from="1580879721799" duration="22000" />
+      <workItem from="1580880344080" duration="674000" />
+      <workItem from="1580899816479" duration="4380000" />
+      <workItem from="1581786735133" duration="3193000" />
+      <workItem from="1582304968836" duration="12929000" />
+      <workItem from="1582496748796" duration="37000" />
+      <workItem from="1582496818525" duration="477000" />
+      <workItem from="1582707420852" duration="1065000" />
+      <workItem from="1582713301133" duration="71000" />
+      <workItem from="1582813484635" duration="2748000" />
+      <workItem from="1582888867722" duration="8745000" />
+      <workItem from="1582978105466" duration="5143000" />
+      <workItem from="1582983270813" duration="22000" />
+      <workItem from="1582983397116" duration="472000" />
+      <workItem from="1582984016020" duration="6601000" />
+      <workItem from="1583228913549" duration="11633000" />
+      <workItem from="1583327203040" duration="766000" />
+      <workItem from="1583748837022" duration="29000" />
+      <workItem from="1583750355111" duration="3095000" />
+      <workItem from="1583839171160" duration="1553000" />
+      <workItem from="1583844557841" duration="6000" />
+      <workItem from="1583844713959" duration="11013000" />
+      <workItem from="1584029209556" duration="866000" />
+      <workItem from="1584342831275" duration="2231000" />
     </task>
     <task id="LOCAL-00001" summary="Added D3Q7 velocity set and tracking older statistical segment iterations.">
       <created>1574050806622</created>
@@ -100,6 +167,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="SHOW_OTHER_BRANCHES" value="true" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -117,5 +187,111 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added D3Q7 velocity set and tracking older statistical segment iterations." />
     <option name="LAST_COMMIT_MESSAGE" value="Added D3Q7 velocity set and tracking older statistical segment iterations." />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="555" y="215" width="800" height="684" key="#Notifications" timestamp="1582905010630">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="555" y="215" width="800" height="684" key="#Notifications/0.27.1920.1053@0.27.1920.1053" timestamp="1582905010630" />
+    <state x="647" y="358" width="615" height="398" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1580415415962">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="647" y="358" width="615" height="398" key="#com.intellij.fileTypes.FileTypeChooser/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1580415415962" />
+    <state x="643" y="289" width="624" height="535" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1582496782632">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="643" y="289" width="624" height="535" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.27.1920.1053@0.27.1920.1053" timestamp="1582496782632" />
+    <state x="2613" y="288" width="524" height="510" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1582312662164">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2613" y="288" width="524" height="510" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1582312662164" />
+    <state x="484" y="96" width="942" height="921" key="CommitChangelistDialog2" timestamp="1584345090754">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="484" y="96" width="942" height="921" key="CommitChangelistDialog2/0.27.1920.1053@0.27.1920.1053" timestamp="1584345090754" />
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1582982359390">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1582707535429" />
+    <state x="2663" y="291" key="FileChooserDialogImpl/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1582306457937" />
+    <state x="743" y="311" width="424" height="491" key="FileChooserDialogImpl/0.27.1920.1053@0.27.1920.1053" timestamp="1582982359390" />
+    <state x="1072" y="311" key="FileChooserDialogImpl/0.27.3840.1053@0.27.3840.1053" timestamp="1580904043252" />
+    <state width="1874" height="261" key="GridCell.Tab.0.bottom" timestamp="1584345187123">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1874" height="273" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1582708261792" />
+    <state width="1874" height="350" key="GridCell.Tab.0.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731634" />
+    <state width="1874" height="261" key="GridCell.Tab.0.bottom/0.27.1920.1053@0.27.1920.1053" timestamp="1584345187123" />
+    <state width="1874" height="270" key="GridCell.Tab.0.bottom/0.27.3840.1053@0.27.3840.1053" timestamp="1584030075694" />
+    <state width="1874" height="261" key="GridCell.Tab.0.center" timestamp="1584345187122">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1874" height="273" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1582708261792" />
+    <state width="1874" height="350" key="GridCell.Tab.0.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731634" />
+    <state width="1874" height="261" key="GridCell.Tab.0.center/0.27.1920.1053@0.27.1920.1053" timestamp="1584345187122" />
+    <state width="1874" height="270" key="GridCell.Tab.0.center/0.27.3840.1053@0.27.3840.1053" timestamp="1584030075693" />
+    <state width="1874" height="261" key="GridCell.Tab.0.left" timestamp="1584345187122">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1874" height="273" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1582708261791" />
+    <state width="1874" height="350" key="GridCell.Tab.0.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731634" />
+    <state width="1874" height="261" key="GridCell.Tab.0.left/0.27.1920.1053@0.27.1920.1053" timestamp="1584345187122" />
+    <state width="1874" height="270" key="GridCell.Tab.0.left/0.27.3840.1053@0.27.3840.1053" timestamp="1584030075692" />
+    <state width="1874" height="261" key="GridCell.Tab.0.right" timestamp="1584345187123">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1874" height="273" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1582708261792" />
+    <state width="1874" height="350" key="GridCell.Tab.0.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731634" />
+    <state width="1874" height="261" key="GridCell.Tab.0.right/0.27.1920.1053@0.27.1920.1053" timestamp="1584345187123" />
+    <state width="1874" height="270" key="GridCell.Tab.0.right/0.27.3840.1053@0.27.3840.1053" timestamp="1584030075693" />
+    <state width="1874" height="350" key="GridCell.Tab.1.bottom" timestamp="1583855731635">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="350" key="GridCell.Tab.1.bottom/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731635" />
+    <state width="1874" height="340" key="GridCell.Tab.1.bottom/0.27.1920.1053@0.27.1920.1053" timestamp="1582906490833" />
+    <state width="1874" height="350" key="GridCell.Tab.1.bottom/0.27.3840.1053@0.27.3840.1053" timestamp="1583246071458" />
+    <state width="1874" height="350" key="GridCell.Tab.1.center" timestamp="1583855731634">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="350" key="GridCell.Tab.1.center/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731634" />
+    <state width="1874" height="340" key="GridCell.Tab.1.center/0.27.1920.1053@0.27.1920.1053" timestamp="1582906490832" />
+    <state width="1874" height="350" key="GridCell.Tab.1.center/0.27.3840.1053@0.27.3840.1053" timestamp="1583246071458" />
+    <state width="1874" height="350" key="GridCell.Tab.1.left" timestamp="1583855731634">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="350" key="GridCell.Tab.1.left/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731634" />
+    <state width="1874" height="340" key="GridCell.Tab.1.left/0.27.1920.1053@0.27.1920.1053" timestamp="1582906490831" />
+    <state width="1874" height="350" key="GridCell.Tab.1.left/0.27.3840.1053@0.27.3840.1053" timestamp="1583246071458" />
+    <state width="1874" height="350" key="GridCell.Tab.1.right" timestamp="1583855731634">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="350" key="GridCell.Tab.1.right/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583855731634" />
+    <state width="1874" height="340" key="GridCell.Tab.1.right/0.27.1920.1053@0.27.1920.1053" timestamp="1582906490832" />
+    <state width="1874" height="350" key="GridCell.Tab.1.right/0.27.3840.1053@0.27.3840.1053" timestamp="1583246071458" />
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1584344572367">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="555" y="289" width="800" height="535" key="Vcs.Push.Dialog.v2/0.27.1920.1053@0.27.1920.1053" timestamp="1584344572367" />
+    <state x="2540" y="363" key="com.intellij.ide.util.TipDialog" timestamp="1583844713871">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="620" y="381" key="com.intellij.ide.util.TipDialog/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1582707421466" />
+    <state x="2540" y="363" key="com.intellij.ide.util.TipDialog/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583844713871" />
+    <state x="620" y="381" key="com.intellij.ide.util.TipDialog/0.27.1920.1053@0.27.1920.1053" timestamp="1582888925791" />
+    <state x="732" y="473" width="455" height="172" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1584344580477">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="732" y="473" width="445" height="167" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1581787599425" />
+    <state x="2652" y="457" width="455" height="172" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1582310222594" />
+    <state x="732" y="473" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.27.1920.1053@0.27.1920.1053" timestamp="1584344580477" />
+    <state x="1248" y="252" key="run.anything.popup" timestamp="1584029309280">
+      <screen x="0" y="27" width="3840" height="1053" />
+    </state>
+    <state x="624" y="252" key="run.anything.popup/0.27.1920.1053/1920.0.1920.1080@0.27.1920.1053" timestamp="1582708194038" />
+    <state x="1248" y="252" key="run.anything.popup/0.27.3840.1053@0.27.3840.1053" timestamp="1584029309280" />
+    <state x="2543" y="239" width="672" height="678" key="search.everywhere.popup" timestamp="1583850471098">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2543" y="239" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1583850471098" />
   </component>
 </project>
