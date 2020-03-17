@@ -50,8 +50,9 @@ SCFT::SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, std::st
     density_A = new double[box_flatten_length];
     density_B = new double[box_flatten_length];
     q_propagator = new qPropagator(NX,NY,NZ,velocity_set,c_s,boundary_conditions,gamma_dot,N,N_s,box_length_rg,field_type,f,chiN,w_A,w_B);
-    q_dagger_propagator = new qStarPropagator(NX,NY,NZ,velocity_set,c_s,boundary_conditions,gamma_dot,N,N_s,box_length_rg,field_type,f,chiN,w_A,w_B);
+    q_dagger_propagator = new qDaggerPropagator(NX, NY, NZ, velocity_set, c_s, boundary_conditions, gamma_dot, N, N_s, box_length_rg, field_type, f, chiN, w_A, w_B);
     tau_LB = q_propagator->tau_LB;
+    std::cout << "chiN parameter: " << chiN << '\n';
 }
 
 
@@ -245,12 +246,17 @@ double SCFT::Determine_Error() {
 
 void SCFT::Run() {
     if(field_type == "scft") {
+
         int index = 1.0;
         double field_error_threshold = pow(10.0,-3.0);
         double variance_threshold = pow(10.0,-5.0);
         double field_error = Determine_Error();
         double variance_error = sqrt(Determine_Variance_Total());
         while(field_error > field_error_threshold || variance_error > variance_threshold) {
+            if(index == 1) {
+                Determine_Density_Differences();
+                output_lbm_data("output/0.csv", true, true);
+            }
             double error_field = Determine_Error();
             double error_variance = Determine_Variance_Total();
             std::cout << index << " - Error: " << error_field << '\n';
@@ -259,7 +265,7 @@ void SCFT::Run() {
             Determine_Density_Differences();
             Update_Fields();
             std::string file_name = "output/" + std::to_string(index) + ".csv";
-            if(index % 200 == 0) {
+            if(index % 200 == 0 || index < 20) {
                 output_lbm_data(file_name, true, true);
             }
             if(!stable()) {

@@ -11,8 +11,8 @@ target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
 add_executable(main_cmdline ${CMAKE_SOURCE_DIR}/LBM/source/LBM.cpp ${CMAKE_SOURCE_DIR}/LBM/source/vector3.cpp ${CMAKE_SOURCE_DIR}/cmdline/main.cpp SCFT/SCFT.cpp SCFT/SCFT.hpp)
 target_sources(main_cmdline
 PRIVATE
-        ${CMAKE_SOURCE_DIR}/SCFT/qStarPropagator.cpp
-        ${CMAKE_SOURCE_DIR}/SCFT/qStarPropagator.hpp
+        ${CMAKE_SOURCE_DIR}/SCFT/qDaggerPropagator.cpp
+        ${CMAKE_SOURCE_DIR}/SCFT/qDaggerPropagator.hpp
         ${CMAKE_SOURCE_DIR}/SCFT/qPropagator.cpp
         ${CMAKE_SOURCE_DIR}/SCFT/qPropagator.hpp
         ${CMAKE_SOURCE_DIR}/SCFT/SCFT.cpp

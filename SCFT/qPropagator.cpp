@@ -13,7 +13,7 @@ qPropagator::qPropagator(int nx, int ny, int nz, std::string velocity_set, doubl
 double qPropagator::field(int x, int y, int z) {
     //Reference [1] - Fields omega_{pm} = N lowercase omega_{pm}
     if(field_type == "scft") {
-        if(s < N * f) {
+        if(s < N_s * f) {
             return w_A[scalar_index(x,y,z)] / N;
         } else {
             return w_B[scalar_index(x,y,z)] / N;

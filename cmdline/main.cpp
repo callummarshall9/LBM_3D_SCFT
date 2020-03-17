@@ -125,7 +125,6 @@ int main(int argc, char** argv) {
     std::cout << "----------Field parameters----------" << '\n';
     std::cout << "Number of integration steps N_s: " << N_s << '\n';
     solver->output_field_parameters();
-    solver->output_lbm_data("output/0.csv", true, true);
     solver->Run();
     solver->output_max();
     solver->output_min();

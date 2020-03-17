@@ -44,11 +44,11 @@ LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double c_s, std::stri
     c_s = c_s * 1.0 / delta_s;
     tau_LB = (b * b) / (6.0 * c_s * c_s) + 0.5;
     viscosity = c_s * c_s * (tau_LB - 0.5);
-    std::cout << "Fredrickson parameter: " << pow(b, 2.0) / 6.0 << '\n';
+    //std::cout << "Fredrickson parameter: " << pow(b, 2.0) / 6.0 << '\n';
     /*
      [1] S. Ayodele, F. Varnik and D. Raabe, "Lattice Boltzmann study of pattern formation in reaction-diffusion systems", Physical Review E, vol. 83, no. 1, 2011. Available: 10.1103/physreve.83.016702
      */
-    std::cout << "D parameter: " << pow(c_s, 2.0) * (tau_LB - 0.5) << '\n';//End of section 2a)}
+    //std::cout << "D parameter: " << pow(c_s, 2.0) * (tau_LB - 0.5) << '\n';//End of section 2a)}
 }
 
 void LBM::output_parameters() {

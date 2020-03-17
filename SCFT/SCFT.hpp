@@ -3,7 +3,7 @@
 //
 
 #include "qPropagator.hpp"
-#include "qStarPropagator.hpp"
+#include "qDaggerPropagator.hpp"
 #include <random>
 #ifndef CMDLINE_LBM_SCFT_HPP
 #define CMDLINE_LBM_SCFT_HPP
@@ -11,7 +11,7 @@
 class SCFT {
 public:
     qPropagator *q_propagator;
-    qStarPropagator *q_dagger_propagator;
+    qDaggerPropagator *q_dagger_propagator;
     SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, std::string boundary_conditions,
          double gamma_dot, double N, int N_s, double f, double chiN, double box_length_rg,
          std::string m_field_type, double mixing_parameter);
