@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include "vector3.hpp"
+#include "../../field_types.cpp"
 
 #ifndef LBM_H_FILE
 #define LBM_H_FILE
@@ -11,7 +12,7 @@ class LBM {
 
 public:
     LBM(int nx, int ny, int nz, std::string velocity_set, double c_s, std::string boundary_condition,
-            double gamma_dot, double N, int N_s, double box_length_rg, std::string field_type,
+            double gamma_dot, double N, int N_s, double box_length_rg, field_types field_type,
             double f, double chiN, double* w_A, double* w_B);
     ~LBM();
     void set_velocity(int x_field, int y_field, int z_field, double u_x, double u_y, double u_z);//Set velocity at position in velocity field.
@@ -41,6 +42,7 @@ public:
     double tau_LB;
     double c_s;
 private:
+    void set_initial_values();
     int viscosity;
     int box_flatten_length;
     int NX,NY,NZ;
@@ -64,7 +66,7 @@ protected:
     const int delta_x = 1.0;
     double delta_s;
     int s = 0;//Since dt=1, this increments before a 'timestep' calculations are done.
-    std::string field_type;
+    field_types field_type;
     double *w_A, *w_B;
     inline int scalar_index(int x, int y, int z) const {
         return (z * NX * NY) + (y * NX) + x;

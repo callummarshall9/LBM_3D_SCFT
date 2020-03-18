@@ -14,6 +14,7 @@
 #include "stringbuffer.h"
 #include "csv.h"
 #include "../SCFT/SCFT.hpp"
+#include "../field_types.cpp"
 #include <math.h>
 
 using namespace rapidjson;
@@ -41,38 +42,36 @@ int main(int argc, char** argv) {
                     std::istreambuf_iterator<char>());
     rapidjson::Document d;
     d.Parse(str.c_str());
-    Value& m_c_s = d["c_s"];
-    Value& m_chain_length = d["chain_length"];
-    Value& m_box_length_rg = d["box_length_rg"];
-    Value& m_velocity_set = d["velocity_set"];
-    Value& m_boundary_conditions = d["boundary_conditions"];
-    Value& m_gamma_dot = d["gamma_dot"];
-    Value& m_field_type = d["field_type"];
-    Value& m_f = d["f"];
-    Value& m_chiN = d["chiN"];
-    Value& m_N_s = d["N_s"];
+    double mixing_parameter = d["mixing_parameter"].GetDouble();
+    double field_error_threshold = d["field_error_threshold"].GetDouble();
+    double variance_threshold = d["variance_threshold"].GetDouble();
     auto grid_size = d["grid_size"].GetArray();
     int NX = grid_size[0].GetInt();
     int NY = grid_size[1].GetInt();
     int NZ = grid_size[2].GetInt();
-    int chain_length = m_chain_length.GetInt();
-    double c_s = m_c_s.GetDouble();
-    double N_s = m_N_s.GetDouble();
-    double box_length_rg = m_box_length_rg.GetDouble();
-    const double R_g = NX / box_length_rg; // Using lattice units L = NX * delta_x, delta_x = 1, L = NX
-    const double b = sqrt(6) / sqrt(chain_length) * R_g;
-    //double tau_LB = 3 * b * b / 6.0 + 0.5;
-    double tau_LB = b * b / (6.0 * c_s * c_s) + 0.5;
-    double gamma_dot = m_gamma_dot.GetDouble();
-    double viscosity = c_s * c_s * (tau_LB - 0.5);
-    double radius_gyration = NX / box_length_rg;
+    double chain_length = d["chain_length"].GetDouble();
+    double c_s = d["c_s"].GetDouble();
+    int N_s = d["N_s"].GetInt();
+    double box_length_rg = d["box_length_rg"].GetDouble();
+    double gamma_dot = d["gamma_dot"].GetDouble();
     int scale = 1;
-    int runs = chain_length * scale * scale * scale;
-    double f = m_f.GetDouble();
-    double chiN = m_chiN.GetDouble();
-    std::string velocity_set = m_velocity_set.GetString();
-    std::string boundary_conditions = m_boundary_conditions.GetString();
-    std::string field_type = m_field_type.GetString();
+    double f = d["f"].GetDouble();
+    double chiN = d["chiN"].GetDouble();
+    std::string velocity_set = d["velocity_set"].GetString();
+    std::string boundary_conditions = d["boundary_conditions"].GetString();
+    std::string m_field_type = d["field_type"].GetString();
+    std::string field_initial = d["field_initial"].GetString();
+    field_types field_type;
+    if(m_field_type == "fixed_sine") {
+        field_type = field_types::fixed_sine;
+    } else if(m_field_type == "fixed_sech") {
+        field_type = field_types::fixed_sech;
+    } else if(m_field_type == "scft") {
+        field_type = field_types::scft;
+    } else {
+        std::cout << "Error: Please use field_type value of fixed_sine,field_sech or scft." << '\n';
+        return -1;
+    }
     if(velocity_set != "D3Q15" && velocity_set != "D3Q27" && velocity_set != "D2Q9" && velocity_set != "D3Q7") {
         std::cout << "Error: Please specify a valid velocity set such as D3Q15,D3Q27,D3Q7 or D2Q9." << '\n';
         return -1;
@@ -90,7 +89,7 @@ int main(int argc, char** argv) {
             NX,NY,NZ,
             velocity_set,c_s,boundary_conditions,
             gamma_dot,chain_length,N_s,f,chiN,box_length_rg,
-            field_type,0.1
+            field_type,mixing_parameter,field_error_threshold, variance_threshold, field_initial
             );
     /*for(int i = 0; i < argc; i++) {
         if(std::string(argv[i]) == "generate_ic") {

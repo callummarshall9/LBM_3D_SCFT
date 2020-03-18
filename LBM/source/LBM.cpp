@@ -7,7 +7,7 @@
 
 
 
-LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double c_s, std::string m_boundary_condition, double m_gamma_dot, double N, int N_s,  double box_length_rg, std::string field_type, double m_f, double chiN,
+LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double c_s, std::string m_boundary_condition, double m_gamma_dot, double N, int N_s,  double box_length_rg, field_types field_type, double m_f, double chiN,
          double* w_A, double* w_B) : NX(nx), NY(ny), NZ(nz),
                                      c_s(c_s), boundary_condition(m_boundary_condition), gamma_dot(m_gamma_dot), velocity_set(velocity_set), N(N), N_s(N_s), f(m_f), chiN(chiN),
                                      w_A(w_A), w_B(w_B), box_length_rg(box_length_rg), field_type(field_type) {
@@ -18,24 +18,7 @@ LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double c_s, std::stri
     particle_distributions_star = new double[distributions_flatten_length];
     particle_distributions = new double[distributions_flatten_length];
     set_velocity_set(velocity_set);
-    for (int i = 0; i < NX * NY * NZ; i++) {
-        chainPropagator[i] = 1.0;
-    }
-    for (int x = 0; x < NX; x++) {
-        for (int y = 0; y < NY; y++) {
-            for (int z = 0; z < NZ; z++) {
-                for (int i = 0; i < direction_size; i++) {
-                    particle_distributions_star[scalar_index(x, y, z, i)] =
-                            weights[i] * chainPropagator[scalar_index(x, y, z, 0)];
-                    particle_distributions[scalar_index(x, y, z, i)] =
-                            weights[i] * chainPropagator[scalar_index(x, y, z, 0)];
-                    if (particle_distributions[scalar_index(x, y, z, i)] == 0) {
-                        std::cout << "Warning, particle distribution initialised to zero." << '\n';
-                    }
-                }
-            }
-        }
-    }
+    set_initial_values();
     box_length_rg = box_length_rg;
     L = (double) NX * 1.0;
     R_g = L / box_length_rg;
@@ -49,6 +32,35 @@ LBM::LBM(int nx, int ny, int nz, std::string velocity_set, double c_s, std::stri
      [1] S. Ayodele, F. Varnik and D. Raabe, "Lattice Boltzmann study of pattern formation in reaction-diffusion systems", Physical Review E, vol. 83, no. 1, 2011. Available: 10.1103/physreve.83.016702
      */
     //std::cout << "D parameter: " << pow(c_s, 2.0) * (tau_LB - 0.5) << '\n';//End of section 2a)}
+}
+
+void LBM::set_initial_values() {
+    for (int i = 0; i < NX * NY * NZ; i++) {
+        chainPropagator[i] = 1.0;
+    }
+    bool warning = false;
+    int wx = 0,wy = 0,wz = 0;
+    for (int x = 0; x < NX; x++) {
+        for (int y = 0; y < NY; y++) {
+            for (int z = 0; z < NZ; z++) {
+                for (int i = 0; i < direction_size; i++) {
+                    particle_distributions_star[scalar_index(x, y, z, i)] =
+                            weights[i] * chainPropagator[scalar_index(x, y, z, 0)];
+                    particle_distributions[scalar_index(x, y, z, i)] =
+                            weights[i] * chainPropagator[scalar_index(x, y, z, 0)];
+                    if (particle_distributions[scalar_index(x, y, z, i)] == 0) {
+                        warning = true;
+                        wx = x;
+                        wy = y;
+                        wz = z;
+                    }
+                }
+            }
+        }
+    }
+    if(warning) {
+        std::cout << "Warning, particle distribution initialised to zero." << '\n';
+    }
 }
 
 void LBM::output_parameters() {
@@ -184,6 +196,7 @@ void LBM::output_velocity() {
 
 void LBM::reset_time() {
     s = 0;
+    set_initial_values();
 }
 
 void LBM::set_velocity(int x_field, int y_field, int z_field, double u_x, double u_y, double u_z) {
@@ -326,10 +339,13 @@ void LBM::output_indices_file() {
 
 double LBM::field(int ix, int iy, int iz) {
     double field;
-    if(field_type == "fixed_sine") {
+    if(field_type == field_types::fixed_sine) {
         field = 10.0 * sin( 2 * M_PI * (ix - L / 2.0) / L) / N;
-    } else if(field_type == "fixed_sech") {
+    } else if(field_type == field_types::fixed_sech) {
         field = (1.0  - 2.0 * pow(1.0 / cosh(3.0 * (ix - L / 2.0) / (2 * R_g)),2.0)) / R_g;
+    } else {
+        std::cout << "Warning: field type not recognised. Using zero field." << '\n';
+        return 0.0;
     }
     return field;
 }

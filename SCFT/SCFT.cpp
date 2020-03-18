@@ -8,8 +8,10 @@
 
 SCFT::SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, std::string boundary_conditions,
            double gamma_dot, double N, int N_s, double f, double chiN, double box_length_rg,
-           std::string m_field_type, double mixing_parameter) : NX(NX), NY(NY), NZ(NZ), velocity_set(velocity_set),
-                                                                          c_s(c_s), boundary_conditions(boundary_conditions), gamma_dot(gamma_dot), N(N), N_s(N_s), f(f), box_length_rg(box_length_rg), chiN(chiN), field_type(m_field_type), mixing_parameter(mixing_parameter) {
+           field_types field_type, double mixing_parameter, double field_error_threshold, double variance_threshold, std::string field_initial) : NX(NX), NY(NY), NZ(NZ), velocity_set(velocity_set),
+                                                                          c_s(c_s), boundary_conditions(boundary_conditions), gamma_dot(gamma_dot), N(N), N_s(N_s), f(f),
+                                                                          box_length_rg(box_length_rg), chiN(chiN), field_type(field_type), mixing_parameter(mixing_parameter),
+                                                                          field_error_threshold(field_error_threshold), variance_threshold(variance_threshold), field_initial(field_initial) {
     int box_flatten_length = NX * NY * NZ;
     w_A = new double[box_flatten_length];
     w_B = new double[box_flatten_length];
@@ -20,14 +22,31 @@ SCFT::SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, std::st
     this->R_g = L / box_length_rg;
     const double b = sqrt(6.0) / sqrt(N) * R_g;
     this->delta_s = 1.0;
+    std::random_device rd{};
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    std::mt19937 gen;
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++) {
-                const double value = 1.0 * sin(2 * M_PI * (x * delta_x - L / 2.0) / L);
-                w_A[scalar_index(x,y,z)] = -value;
-                w_B[scalar_index(x,y,z)] = value;
+                if(field_initial == "sine") {
+                    const double value = 1.0 * sin(2 * M_PI * (x * delta_x - L / 2.0) / L);
+                    w_A[scalar_index(x,y,z)] = -value;
+                    w_B[scalar_index(x,y,z)] = value;
+                } else if(field_initial == "random") {
+                    w_A[scalar_index(x,y,z)] = dist(gen) * 0.1;
+                    w_B[scalar_index(x,y,z)] = dist(gen) * 0.1;
+                } else {
+                    w_A[scalar_index(x,y,z)] = 0.0;
+                    w_B[scalar_index(x,y,z)] = 0.0;
+                }
+
             }
         }
+    }
+    const int midpoint = NX / 2;
+    if(field_initial == "halfway") {
+        w_B[0] = -5.0;
+        w_B[scalar_index(midpoint,0,0)] = 5.0;
     }
 
     /*
@@ -138,8 +157,8 @@ double SCFT::compute_Q() {
     sum_q /= (NX * NY * NZ);
     sum_q_star /= (NX * NY * NZ);
 
-    if((sum_q - sum_q_star) > 0.0001) {//If the difference in the q and q star Q value propagations don't match, output a warning.
-        //std::cout << "Warning: Q for q propagator doesn't match q star propagator." << '\n';
+    if((sum_q - sum_q_star) > 0.001) {//If the difference in the q and q star Q value propagations don't match, output a warning.
+        std::cout << "Warning: Q for q propagator doesn't match q star propagator." << '\n';
     }
     if(sum_q > sum_q_star) {
         return sum_q;
@@ -149,7 +168,7 @@ double SCFT::compute_Q() {
 }
 
 
-double SCFT::compute_reduced_density_segment_A(int x, int y, int z) {
+double SCFT::compute_reduced_density_segment_A(int x, int y, int z, double Q) {
     double* chainPropagatorQ = q_propagator->get_chain_propagator();
     double* chainPropagatorQStar = q_dagger_propagator->get_chain_propagator();
     double sum = 0.0;
@@ -157,11 +176,11 @@ double SCFT::compute_reduced_density_segment_A(int x, int y, int z) {
     for(int s = 0; s < up_to; s++) {
         sum += chainPropagatorQStar[scalar_index(x,y,z,N - s)] * chainPropagatorQ[scalar_index(x,y,z,s)] * delta_s;
     }
-    sum /= (compute_Q() * N);
+    sum /= (Q * N);
     return sum;
 }
 
-double SCFT::compute_reduced_density_segment_B(int x, int y, int z) {
+double SCFT::compute_reduced_density_segment_B(int x, int y, int z, double Q) {
     double* chainPropagatorQ = q_propagator->get_chain_propagator();
     double* chainPropagatorQStar = q_dagger_propagator->get_chain_propagator();
     double sum = 0.0;
@@ -169,17 +188,18 @@ double SCFT::compute_reduced_density_segment_B(int x, int y, int z) {
     for(int s = up_to; s < N; s++) {
         sum += chainPropagatorQStar[scalar_index(x,y,z,N - s)] * chainPropagatorQ[scalar_index(x,y,z,s)] * delta_s;
     }
-    sum /= (compute_Q() * N);
+    sum /= (Q * N);
     return sum;
 }
 
 
 void SCFT::Determine_Density_Differences() {
+    double Q = compute_Q();
     for(int x = 0; x < NX; x++) {
         for(int y = 0; y < NY; y++) {
             for(int z = 0; z < NZ; z++) {
-                density_A[scalar_index(x,y,z)] = compute_reduced_density_segment_A(x,y,z);
-                density_B[scalar_index(x,y,z)] = compute_reduced_density_segment_B(x,y,z);
+                density_A[scalar_index(x,y,z)] = compute_reduced_density_segment_A(x,y,z, Q);
+                density_B[scalar_index(x,y,z)] = compute_reduced_density_segment_B(x,y,z, Q);
             }
         }
     }
@@ -245,15 +265,12 @@ double SCFT::Determine_Error() {
 }
 
 void SCFT::Run() {
-    if(field_type == "scft") {
-
+    if(field_type == field_types::scft) {
         int index = 1.0;
-        double field_error_threshold = pow(10.0,-3.0);
-        double variance_threshold = pow(10.0,-5.0);
         double field_error = Determine_Error();
         double variance_error = sqrt(Determine_Variance_Total());
         while(field_error > field_error_threshold || variance_error > variance_threshold) {
-            if(index == 1) {
+            if(index == 1) {//If index is 1, just before the first propagation run output the propagators.
                 Determine_Density_Differences();
                 output_lbm_data("output/0.csv", true, true);
             }
@@ -306,6 +323,10 @@ void SCFT::output_parameters() {
 
 void SCFT::output_field_parameters() {
     q_propagator->output_field_parameters();
+    std::cout << "Field error threshold: " << field_error_threshold << '\n';
+    std::cout << "Variance error threshold: " << variance_threshold << '\n';
+    std::cout << "Simple mixing parameter: " << mixing_parameter << '\n';
+    std::cout << "Field initial configuration (ignore if field_type !=scft): " << field_initial << '\n';
 }
 
 double SCFT::find_u_max() {

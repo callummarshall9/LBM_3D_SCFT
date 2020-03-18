@@ -4,6 +4,7 @@
 
 #include "qPropagator.hpp"
 #include "qDaggerPropagator.hpp"
+#include "../field_types.cpp"
 #include <random>
 #ifndef CMDLINE_LBM_SCFT_HPP
 #define CMDLINE_LBM_SCFT_HPP
@@ -14,11 +15,11 @@ public:
     qDaggerPropagator *q_dagger_propagator;
     SCFT(int NX, int NY, int NZ, std::string velocity_set, double c_s, std::string boundary_conditions,
          double gamma_dot, double N, int N_s, double f, double chiN, double box_length_rg,
-         std::string m_field_type, double mixing_parameter);
+         field_types field_type, double mixing_parameter, double field_error_threshold, double density_error_threshold, std::string field_initial);
     void Run();
     double Determine_Error();
     void Update_Fields();
-    double compute_reduced_density_segment_A(int x, int y, int z), compute_reduced_density_segment_B(int x, int y, int z);
+    double compute_reduced_density_segment_A(int x, int y, int z, double Q), compute_reduced_density_segment_B(int x, int y, int z, double Q);
     double Determine_Variance_Total();
     void Determine_Density_Differences();
     double compute_Q();
@@ -41,11 +42,12 @@ private:
     double box_length_rg;
     double N;
     int N_s;
-    double mixing_parameter;
+    double mixing_parameter,field_error_threshold,variance_threshold;
     double R_g;
     int NX, NY, NZ;
     int s = 0;
-    std::string field_type;
+    field_types field_type;
+    std::string field_initial;
     std::string velocity_set,boundary_conditions;
     double c_s, gamma_dot,f,chiN;
     double *w_A,*w_B,*density_A,*density_B;//FTS fields.
